@@ -3,7 +3,8 @@
     <head>
         <title>Form validation with messages on top: Code example - Accessibility Developer Guide example</title>
         <meta charset="utf-8">
-        <style>.control, fieldset {
+        <style>
+        .control, fieldset {
       margin: 6px 0;
     }
     
@@ -23,50 +24,49 @@
     
     fieldset ul {
       margin: 0;
-    }</style>
+    }
+    
+   
+    </style>
     </head>
     <body>
         <h1>Feedback form</h1>
+        <p> Fields with an asterisk(<span class="required" aria-hidden="true">*</span>) are required.</p>
     <form>
-      <!-- added fieldset -->
-      <fieldset>
-        <legend>Basic information</legend>
         <div class="control">
-          <!-- add for="name" to connect -->
-          <label for="name">Full name <span class="required">*</span></label>
-          <!-- added required and aria-required, change name="name" -->
-          <input id="name" name="name" type="text"/>
+          <!-- I put the correct label for the input and a * to signify it's required -->
+           <!-- I put aria-hidden="true" to hide the asterisk from the screen readers -->
+            <!-- I put required aria-required="true" on each input to enable the screen readers know it's required -->
+          <label for="name">Full name <span class="required" aria-hidden="true">*</span></label><input id="name" name="name" type="text" aria-required="true"   aria-required="true" aria-describedby="let seeeeee"/>
         </div>
         <div class="control">
-          <!-- add for="biography" and aria-describedby="biodescribe" to associate -->
-          <label for="biography">Biography <span class="required">*</span></label>
-          <textarea id="biography" name="biography" type="text" aria-describedby="biodescribe"></textarea>
-          <!-- add id="biodescribe" -->
-          <span id="biodescribe">Include examples on your skills in JavaScript.</span>
+          <label for="biography" >Biography <span class="required" aria-hidden="true">*</span></label><textarea id="biography" name="biography" type="text"  aria-required="true"></textarea>
+          <span>Include examples on your skills in JavaScript.</span>
         </div>
-      </fieldset>
-        <!-- add fieldset and legent for checkboxes -->
+        <!-- added a fieldset, legend, the correct label for the input and a * to signify it's required -->
         <fieldset>
-          <legend>Gender<span class="required">*</span></legend>
+          <legend>Gender <span class="required" aria-hidden="true">*</span></legend>
           <div class="control">
-            <!-- add for in label -->
-            <input id="gender_male" name="gender" type="radio" value="male"/>
-            <label for="gender_male">Male</label>
+            <input id="gender_male" name="gender" type="radio" value="male"   aria-required="true"/><label for="gender_male" aria-hidden="true">Male</label>
           </div>
           <div class="control">
-            <input id="gender_female" name="gender" type="radio" value="female" />
-            <!-- add for in label -->
-            <label for="gender_female">Female</label>
+            <input id="gender_female" name="gender" type="radio" value="female"   aria-required="true" /><label for="gender_female" aria-hidden="true">Female</label>
           </div>
         </fieldset>
+        
+      <div class="control">
+        <input id="accept_agbs" name="accept_agbs" type="checkbox" value="1"  aria-required="true" aria-labelledby="accept-label" />
+        <label id="accept-label" for="accept_agbs" aria-hidden="true">
+            I accept the terms and conditions <span class="required" aria-hidden="true">*</span>
+        </label>
+    </div>
+      
+       
         <div class="control">
-          <input id="accept_agbs" name="accept_agbs" type="checkbox" value="1"/><label for="accept_agbs">I accept the terms and conditions<span class="required">*</span></label>
+          <input name="validate" type="hidden" value="1" />
+          <!-- changed the input to a button -->
+          <button type="submit">Register</button>
         </div>
-        <div class="control">
-          <!-- added instructions by aria-label -->
-          <input name="validate" type="hidden" value="1" /><input type="submit" value="Register" aria-label="register button to submit the form"/>
-        </div>
-
       </form>
       
           <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -86,7 +86,6 @@
             return decodeURI(results[1]) || null;
           }
         };
-
       
         validateInput = function validateInput(input, message) {
           var $elementToDescribe, $error, $errorContainer, $fieldset, $input, $referencedElement, value;
@@ -110,8 +109,8 @@
               $referencedElement = $input;
             }
       // R.G. hint: fix next line ;)
-            // modified $error to link to the field having issue
-            $error = $('<a href="#' + input + '">' + message + '</a>');
+      // fixed the link by adding the href attribute and the class
+      $error = $('<a href="#'+input+'" class="error">' + message + '</a>');
             $error.click(function (e) {
               // If we rely on the link's href pointing to the input's ID, it doesn't trigger forms mode in screen readers
               $referencedElement.focus();
@@ -120,9 +119,10 @@
             $elementToDescribe.attr('aria-describedby', input + '_description');
             $errorContainer.append('<li>').find('li:last').append($error);
       
+              //added the reference element
             if ($(':not(form):focus').length === 0) {
               // See https://stackoverflow.com/questions/46134247/jquery-setting-focus-doesnt-work-in-ie11/
-              $errorContainer.focus();
+              $referencedElement.focus();
             }
           } else {
             if ($input.is(':checkbox')) {
@@ -140,11 +140,11 @@
         $(document).ready(function () {
           if ($.urlParam('validate')) {
             validateInput('name', 'Please enter your name!');
-            validateInput('biography', 'Please tell us something about your skills in JavaScript!');
+            validateInput('biography', 'Please tell us something about your history!');
             validateInput('gender', 'Please tell us your gender!');
             validateInput('accept_agbs', 'You must accept our terms and conditions!');
-      // changed to errors
-            if ($('.errors').length === 0) {
+      
+            if ($('.error').length === 0) {
               return alert('All inputs are valid.');
             }
           }
